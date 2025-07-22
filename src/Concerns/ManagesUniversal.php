@@ -1,8 +1,8 @@
 <?php
-namespace IEXBase\TronAPI\Concerns;
+namespace Wuaidajiejie\TronAPI\Concerns;
 
 
-use IEXBase\TronAPI\Exception\ErrorException;
+use Wuaidajiejie\TronAPI\Exception\ErrorException;
 
 trait ManagesUniversal
 {

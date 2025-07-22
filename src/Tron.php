@@ -14,18 +14,18 @@
 
 declare(strict_types=1);
 
-namespace IEXBase\TronAPI;
+namespace Wuaidajiejie\TronAPI;
 
 use Elliptic\EC;
-use IEXBase\TronAPI\Exception\TRC20Exception;
-use IEXBase\TronAPI\Support\Base58;
-use IEXBase\TronAPI\Support\Base58Check;
-use IEXBase\TronAPI\Support\Crypto;
-use IEXBase\TronAPI\Support\Hash;
-use IEXBase\TronAPI\Support\Keccak;
-use IEXBase\TronAPI\Support\Utils;
-use IEXBase\TronAPI\Provider\HttpProviderInterface;
-use IEXBase\TronAPI\Exception\TronException;
+use Wuaidajiejie\TronAPI\Exception\TRC20Exception;
+use Wuaidajiejie\TronAPI\Support\Base58;
+use Wuaidajiejie\TronAPI\Support\Base58Check;
+use Wuaidajiejie\TronAPI\Support\Crypto;
+use Wuaidajiejie\TronAPI\Support\Hash;
+use Wuaidajiejie\TronAPI\Support\Keccak;
+use Wuaidajiejie\TronAPI\Support\Utils;
+use Wuaidajiejie\TronAPI\Provider\HttpProviderInterface;
+use Wuaidajiejie\TronAPI\Exception\TronException;
 
 /**
  * A PHP API for interacting with the Tron (TRX)

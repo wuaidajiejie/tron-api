@@ -1,5 +1,5 @@
 {
-    "name": "iexbase/tron-api",
+    "name": "wuaidajiejie/tron-api",
     "description": "A PHP API for interacting with Tron (Trx)",
     "license": "MIT",
     "type":   "library",
@@ -8,10 +8,14 @@
         {
             "name": "Shamsudin Serderov",
             "email": "steein.shamsudin@gmail.com"
+        },{
+            "name": "wuaidajiejie",
+            "email": "wuaidajiejie@gmail.com"
         }
     ],
     "keywords": [
         "iexbase",
+        "wuaidajiejie",
         "tron-lib",
         "tron-php",
         "tron-api",
@@ -34,13 +38,13 @@
     },
     "autoload": {
         "psr-4": {
-            "IEXBase\\TronAPI\\": "src"
+            "Wuaidajiejie\\TronAPI\\": "src"
         }
     },
 
     "autoload-dev": {
         "psr-4": {
-            "IEXBase\\TronAPI\\Test\\": "tests"
+            "Wuaidajiejie\\TronAPI\\Test\\": "tests"
         }
     },
 

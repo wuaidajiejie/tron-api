@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace IEXBase\TronAPI\Provider;
+namespace Wuaidajiejie\TronAPI\Provider;
 
 use GuzzleHttp\{Psr7\Request, Client, ClientInterface};
 use Psr\Http\Message\StreamInterface;
-use IEXBase\TronAPI\Exception\{NotFoundException, TronException};
-use IEXBase\TronAPI\Support\Utils;
+use Wuaidajiejie\TronAPI\Exception\{NotFoundException, TronException};
+use Wuaidajiejie\TronAPI\Support\Utils;
 
 class HttpProvider implements HttpProviderInterface
 {

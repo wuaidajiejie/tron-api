@@ -1,5 +1,5 @@
 <?php
-namespace IEXBase\TronAPI\Exception;
+namespace Wuaidajiejie\TronAPI\Exception;
 
 use InvalidArgumentException;
 

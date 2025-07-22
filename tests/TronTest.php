@@ -1,8 +1,8 @@
 <?php
-namespace IEXBase\TronAPI\Tests;
+namespace Wuaidajiejie\TronAPI\Tests;
 
-use IEXBase\TronAPI\Provider\HttpProvider;
-use IEXBase\TronAPI\Tron;
+use Wuaidajiejie\TronAPI\Provider\HttpProvider;
+use Wuaidajiejie\TronAPI\Tron;
 use PHPUnit\Framework\TestCase;
 
 class TronTest extends TestCase

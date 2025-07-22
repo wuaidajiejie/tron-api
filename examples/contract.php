@@ -2,14 +2,14 @@
 
 include_once '../vendor/autoload.php';
 
-use IEXBase\TronAPI\Tron;
+use Wuaidajiejie\TronAPI\Tron;
 
 
 try {
-    $fullNode = new \IEXBase\TronAPI\Provider\HttpProvider('https://api.trongrid.io');
-    $solidityNode = new \IEXBase\TronAPI\Provider\HttpProvider('https://api.trongrid.io');
-    $eventServer = new \IEXBase\TronAPI\Provider\HttpProvider('https://api.trongrid.io');
-} catch (\IEXBase\TronAPI\Exception\TronException $e) {
+    $fullNode = new \Wuaidajiejie\TronAPI\Provider\HttpProvider('https://api.trongrid.io');
+    $solidityNode = new \Wuaidajiejie\TronAPI\Provider\HttpProvider('https://api.trongrid.io');
+    $eventServer = new \Wuaidajiejie\TronAPI\Provider\HttpProvider('https://api.trongrid.io');
+} catch (\Wuaidajiejie\TronAPI\Exception\TronException $e) {
     echo $e->getMessage();
 }
 
@@ -26,6 +26,6 @@ try {
     //echo  $contract->transfer('to', 'amount', 'from');
 
 
-} catch (\IEXBase\TronAPI\Exception\TronException $e) {
+} catch (\Wuaidajiejie\TronAPI\Exception\TronException $e) {
     echo $e->getMessage();
 }
