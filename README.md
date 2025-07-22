@@ -7,11 +7,7 @@ A PHP API for interacting with the Tron Protocol
 [![Contributors](https://img.shields.io/github/contributors/iexbase/tron-api.svg)](https://github.com/iexbase/tron-api/graphs/contributors)
 [![Total Downloads](https://img.shields.io/packagist/dt/iexbase/tron-api.svg?style=flat-square)](https://packagist.org/packages/iexbase/tron-api)
 
-## Install
 
-```bash
-> composer require iexbase/tron-api
-```
 ## Requirements
 
 The following versions of PHP are supported by this version.
@@ -21,18 +17,17 @@ The following versions of PHP are supported by this version.
 ## Example Usage
 
 ```php
-use IEXBase\TronAPI\Tron;
+use Wuaidajiejie\TronAPI\Tron;
 
-$fullNode = new \IEXBase\TronAPI\Provider\HttpProvider('https://api.trongrid.io');
-$solidityNode = new \IEXBase\TronAPI\Provider\HttpProvider('https://api.trongrid.io');
-$eventServer = new \IEXBase\TronAPI\Provider\HttpProvider('https://api.trongrid.io');
+$fullNode = new \Wuaidajiejie\TronAPI\Provider\HttpProvider('https://api.trongrid.io');
+$solidityNode = new \Wuaidajiejie\TronAPI\Provider\HttpProvider('https://api.trongrid.io');
+$eventServer = new \Wuaidajiejie\TronAPI\Provider\HttpProvider('https://api.trongrid.io');
 
 try {
-    $tron = new \IEXBase\TronAPI\Tron($fullNode, $solidityNode, $eventServer);
-} catch (\IEXBase\TronAPI\Exception\TronException $e) {
+    $tron = new \Wuaidajiejie\TronAPI\Tron($fullNode, $solidityNode, $eventServer);
+} catch (\Wuaidajiejie\TronAPI\Exception\TronException $e) {
     exit($e->getMessage());
 }
-
 
 $this->setAddress('..');
 //Balance
@@ -50,19 +45,6 @@ var_dump($tron->getLatestBlocks(2));
 //Change account name (only once)
 var_dump($tron->changeAccountName('address', 'NewName'));
 
-
 // Contract
 $tron->contract('Contract Address');
-
-
-
 ```
-
-## Testing
-
-``` bash
-$ vendor/bin/phpunit
-```
-
-## Donations
-**Tron(TRX)**: TRWBqiqoFZysoAeyR1J35ibuyc8EvhUAoY
