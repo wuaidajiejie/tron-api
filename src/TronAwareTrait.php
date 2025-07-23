@@ -3,6 +3,8 @@
 namespace Wuaidajiejie\TronAPI;
 
 use Wuaidajiejie\TronAPI\Support\{Base58Check, BigInteger, Keccak};
+use Exception;
+
 trait TronAwareTrait
 {
     /**
@@ -11,7 +13,7 @@ trait TronAwareTrait
      * @param $string
      * @return string
      */
-    public function fromHex($string)
+    public function fromHex($string): string
     {
         if(strlen($string) == 42 && mb_substr($string,0,2) === '41') {
             return $this->hexString2Address($string);
@@ -26,7 +28,7 @@ trait TronAwareTrait
      * @param $str
      * @return string
      */
-    public function toHex($str)
+    public function toHex($str): string
     {
         if(mb_strlen($str) == 34 && mb_substr($str, 0, 1) === 'T') {
             return $this->address2HexString($str);
@@ -41,7 +43,7 @@ trait TronAwareTrait
      * @param $sHexAddress
      * @return string
      */
-    public function address2HexString($sHexAddress)
+    public function address2HexString($sHexAddress): string
     {
         if(strlen($sHexAddress) == 42 && mb_strpos($sHexAddress, '41') == 0) {
             return $sHexAddress;
@@ -55,7 +57,7 @@ trait TronAwareTrait
      * @param $sHexString
      * @return string
      */
-    public function hexString2Address($sHexString)
+    public function hexString2Address($sHexString): string
     {
         if(!ctype_xdigit($sHexString)) {
             return $sHexString;
@@ -74,7 +76,7 @@ trait TronAwareTrait
      * @param $sUtf8
      * @return string
      */
-    public function stringUtf8toHex($sUtf8)
+    public function stringUtf8toHex($sUtf8): string
     {
         return bin2hex($sUtf8);
     }
@@ -85,7 +87,7 @@ trait TronAwareTrait
      * @param $sHexString
      * @return string
      */
-    public function hexString2Utf8($sHexString)
+    public function hexString2Utf8($sHexString): string
     {
         return hex2bin($sHexString);
     }
@@ -96,7 +98,8 @@ trait TronAwareTrait
      * @param $str
      * @return BigInteger
      */
-    public function toBigNumber($str) {
+    public function toBigNumber($str): BigInteger
+    {
         return new BigInteger($str);
     }
 
@@ -113,7 +116,7 @@ trait TronAwareTrait
     /**
      * Convert float to trx format
      *
-     * @param $double
+     * @param $amount
      * @return int
      */
     public function toTron($amount): int {
@@ -127,9 +130,9 @@ trait TronAwareTrait
      * @param $string
      * @param bool $prefix
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
-    public function sha3($string, $prefix = true)
+    public function sha3($string, bool $prefix = true): string
     {
         return ($prefix ? '0x' : ''). Keccak::hash($string, 256);
     }

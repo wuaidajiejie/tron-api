@@ -32,21 +32,13 @@ class TRC20
     public function balance(string $address): string
     {
         $address = $this->tron->address2HexString($address);
-        if (Utils::isAddress($address)) {
-            $address = strtolower($address);
-
-            if (Utils::isZeroPrefixed($address)) {
-                $address = Utils::stripZero($address);
-            }
-        }
-        $format = implode('', array_fill(0, 64 - strlen($address), 0)) . $address;
+        $format = Utils::toAddressFormat($address);
         $body = $this->tron->getManager()->request('/wallet/triggersmartcontract', [
             'contract_address' => $this->tron->address2HexString($this->contractAddress),
             'function_selector' => 'balanceOf(address)',
             'parameter' => $format,
             'owner_address' => $address,
         ]);
-
         if (isset($body['result']['code'])) {
             throw new TronException(hex2bin($body['result']['message']));
         }
@@ -58,4 +50,50 @@ class TRC20
         return $balance;
     }
 
+    /**
+     * @throws TronException
+     */
+    public function transfer(string $from, string $to, float $amount, string $privateKey = '')
+    {
+        $this->tron->setAddress($from);
+        if(isset($privateKey)){
+            $this->tron->setPrivateKey($privateKey);
+        }
+        $toFormat = Utils::toAddressFormat($this->tron->address2HexString($to));
+        try {
+            $amount = Utils::toMinUnitByDecimals($amount, $this->decimals);
+        } catch (InvalidArgumentException $e) {
+            throw new TronException($e->getMessage());
+        }
+        $numberFormat = Utils::toIntegerFormat($amount);
+        $body = $this->tron->getManager()->request('/wallet/triggersmartcontract', [
+            'contract_address' => $this->tron->address2HexString($this->contractAddress),
+            'function_selector' => 'transfer(address,uint256)',
+            'parameter' => "{$toFormat}{$numberFormat}",
+            'fee_limit' => 100000000,
+            'call_value' => 0,
+            'owner_address' => $this->tron->address2HexString($from),
+        ]);
+
+        if (isset($body['result']['code'])) {
+            throw new TronException(hex2bin($body['result']['message']));
+        }
+
+        try {
+            $tradeobj = $this->tron->signTransaction($body['transaction']);
+            $response = $this->tron->sendRawTransaction($tradeobj);
+        } catch (TronException $e) {
+            throw new TronException($e->getMessage(), $e->getCode());
+        }
+
+        if (isset($response['result']) && $response['result']) {
+            return new Transaction(
+                $body['transaction']['txID'],
+                $body['transaction']['raw_data'],
+                'PACKING'
+            );
+        } else {
+            throw new TronException(hex2bin($response['message']));
+        }
+    }
 }

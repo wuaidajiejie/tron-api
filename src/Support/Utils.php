@@ -342,4 +342,94 @@ class Utils
 
         return $ret;
     }
+
+    public static function toMinUnitByDecimals($number, int $decimals): BigInteger
+    {
+        $number = self::safeNumber($number, $decimals); // 先安全格式化
+        if (strpos($number, '.') !== false) {
+            list($intPart, $decPart) = explode('.', $number);
+            $decPart = str_pad(substr($decPart, 0, $decimals), $decimals, '0');
+            $number = $intPart . $decPart;
+        } else {
+            $number .= str_repeat('0', $decimals);
+        }
+        return new BigInteger($number);
+    }
+
+
+    /**
+     * 将数字安全转换为十进制字符串，避免科学计数法
+     *
+     * @param int|float|string $number
+     * @param int $scale 保留的小数位数（默认18位，适合区块链精度）
+     * @return string
+     */
+    public static function safeNumber($number, int $scale = 18): string
+    {
+        if ($number instanceof \phpseclib\Math\BigInteger) {
+            return $number->toString();
+        }
+
+        // 如果是int，直接转string
+        if (is_int($number)) {
+            return (string)$number;
+        }
+
+        // 如果是float，强制转换为string
+        if (is_float($number)) {
+            // 使用 number_format 保留精度
+            return number_format($number, $scale, '.', '');
+        }
+
+        // 如果是string
+        if (is_string($number)) {
+            $number = trim($number);
+
+            // 检查是否是科学计数法
+            if (stripos($number, 'e') !== false) {
+                $floatVal = (float)$number;
+                return number_format($floatVal, $scale, '.', '');
+            }
+
+            return $number;
+        }
+
+        throw new InvalidArgumentException('safeNumber only supports int, float, string, or BigInteger.');
+    }
+
+
+    /**
+     * 地址签名
+     * @param $address
+     * @return string
+     */
+    public static function toAddressFormat($address): string
+    {
+        if (Utils::isAddress($address)) {
+            $address = strtolower($address);
+
+            if (Utils::isZeroPrefixed($address)) {
+                $address = Utils::stripZero($address);
+            }
+        }
+        return implode('', array_fill(0, 64 - strlen($address), 0)) . $address;
+    }
+
+    /**
+     * 数字签名
+     * @param $value
+     * @param int $digit
+     * @return string
+     */
+    public static function toIntegerFormat($value, int $digit = 64): string
+    {
+        $bn = Utils::toBn($value);
+        $bnHex = $bn->toHex(true);
+        $padded = mb_substr($bnHex, 0, 1);
+
+        if ($padded !== 'f') {
+            $padded = '0';
+        }
+        return implode('', array_fill(0, $digit - mb_strlen($bnHex), $padded)) . $bnHex;
+    }
 }
