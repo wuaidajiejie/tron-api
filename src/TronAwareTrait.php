@@ -116,8 +116,9 @@ trait TronAwareTrait
      * @param $double
      * @return int
      */
-    public function toTron($double): int {
-        return (int) bcmul((string)$double, (string)1e6,0);
+    public function toTron($amount): int {
+        $amount = sprintf('%.6f', $amount);
+        return (int) bcmul($amount, '1000000', 0);
     }
 
     /**
