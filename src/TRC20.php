@@ -53,7 +53,7 @@ class TRC20
     /**
      * @throws TronException
      */
-    public function transfer(string $from, string $to, float $amount, string $privateKey = '')
+    public function transfer(string $from, string $to, float $amount, string $privateKey = ''): Transaction
     {
         $this->tron->setAddress($from);
         if(isset($privateKey)){

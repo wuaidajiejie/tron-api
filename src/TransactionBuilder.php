@@ -597,4 +597,55 @@ return $trc20;
 
         throw new TronException('Failed to execute. Error:'.$message);
     }
+
+    /**
+     * @throws TronException
+     */
+    public function delegateResource(string $address, string $receiver_address, float $amount = 0, string $resource = 'BANDWIDTH'): array
+    {
+        if (!in_array($resource, ['BANDWIDTH', 'ENERGY'])) {
+            throw new TronException('Invalid resource provided: Expected "BANDWIDTH" or "ENERGY"');
+        }
+
+        if (!is_float($amount)) {
+            throw new TronException('Invalid amount provided');
+        }
+
+        return $this->tron->getManager()->request('wallet/delegateresource', [
+            'owner_address' => $address,
+            'receiver_address'=>$receiver_address,
+            'balance'=>$this->tron->toTron($amount),
+            'resource' => $resource,
+            'lock'=>false,
+            'visible'=>true
+        ]);
+    }
+
+    /**
+     * @throws TronException
+     */
+    public function unDelegateResource(string $owner_address, string $receiver_address, int $amount, string $resource = 'BANDWIDTH'): array
+    {
+        if (!in_array($resource, ['BANDWIDTH', 'ENERGY'])) {
+            throw new TronException('Invalid resource provided: Expected "BANDWIDTH" or "ENERGY"');
+        }
+
+        return $this->tron->getManager()->request('wallet/undelegateresource', [
+            'owner_address' =>  $owner_address,
+            'receiver_address'=>$receiver_address,
+            'balance'=>$amount,
+            'resource' => $resource,
+            'visible'=>true
+        ]);
+    }
+
+    public function getdelegatedresourcev2(string $fromAddress,string $toAddress): array
+    {
+        return $this->tron->getManager()->request('wallet/getdelegatedresourcev2', [
+            "fromAddress"=> $fromAddress,
+            "toAddress"=>$toAddress,
+            'visible'=>true
+        ]);
+    }
+
 }
