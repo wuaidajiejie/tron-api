@@ -3,9 +3,13 @@ namespace Wuaidajiejie\TronAPI\Support;
 
 use Exception;
 use InvalidArgumentException;
+use kornrunner\Keccak;
+use phpseclib\Math\BigInteger;
 
 class Utils
 {
+    const SHA3_NULL_HASH = 'c5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470';
+
     /**
      * Link verification
      *
@@ -32,7 +36,7 @@ class Utils
      * @param string
      * @return bool
      */
-    public static function isZeroPrefixed($value)
+    public static function isZeroPrefixed($value): bool
     {
         if (!is_string($value)) {
             throw new InvalidArgumentException('The value to isZeroPrefixed function must be string.');
@@ -46,7 +50,7 @@ class Utils
      * @param string $value
      * @return string
      */
-    public static function stripZero($value)
+    public static function stripZero($value): string
     {
         if (self::isZeroPrefixed($value)) {
             $count = 1;
@@ -61,7 +65,7 @@ class Utils
      * @param string
      * @return bool
      */
-    public static function isNegative($value)
+    public static function isNegative($value): bool
     {
         if (!is_string($value)) {
             throw new InvalidArgumentException('The value to isNegative function must be string.');
@@ -85,7 +89,7 @@ class Utils
      * @param string
      * @return string
      */
-    public static function hexToBin($value)
+    public static function hexToBin($value): string
     {
         if (!is_string($value)) {
             throw new InvalidArgumentException('The value to hexToBin function must be string.');
@@ -102,7 +106,7 @@ class Utils
      * @return bool
      * @throws Exception
      */
-    public static function validate($address)
+    public static function validate($address): bool
     {
         $decoded = Base58::decode($address);
 
@@ -118,7 +122,7 @@ class Utils
     /**
      * @throws Exception
      */
-    public static function decodeBase58($input)
+    public static function decodeBase58($input): string
     {
         $alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 
@@ -151,7 +155,8 @@ class Utils
      *
      * @throws Exception
      */
-    public static function pubKeyToAddress($pubkey) {
+    public static function pubKeyToAddress($pubkey): string
+    {
         return '41'. substr(Keccak::hash(substr(hex2bin($pubkey), 1), 256), 24);
     }
 
@@ -164,7 +169,7 @@ class Utils
      * @return bool
      *   TRUE if string has "0x" prefix or FALSE.
      */
-    public static function hasHexPrefix($str)
+    public static function hasHexPrefix($str): bool
     {
         return substr($str, 0, 2) === '0x';
     }
@@ -175,11 +180,166 @@ class Utils
      * @param string $str
      * @return string
      */
-    public static function removeHexPrefix($str)
+    public static function removeHexPrefix(string $str): string
     {
         if (!self::hasHexPrefix($str)) {
             return $str;
         }
         return substr($str, 2);
+    }
+
+    /**
+     * isAddressChecksum
+     *
+     * @param string $value
+     * @return bool
+     */
+    public static function isAddressChecksum(string $value): bool
+    {
+        $value = self::stripZero($value);
+        $hash = self::stripZero(self::sha3(mb_strtolower($value)));
+
+        for ($i = 0; $i < 40; $i++) {
+            if (
+                (intval($hash[$i], 16) > 7 && mb_strtoupper($value[$i]) !== $value[$i]) ||
+                (intval($hash[$i], 16) <= 7 && mb_strtolower($value[$i]) !== $value[$i])
+            ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * sha3
+     * keccak256
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function sha3(string $value): ?string
+    {
+        if (strpos($value, '0x') === 0) {
+            $value = self::hexToBin($value);
+        }
+        try {
+            $hash = Keccak::hash($value, 256);
+        } catch (Exception $e) {
+            return null;
+        }
+
+        if ($hash === self::SHA3_NULL_HASH) {
+            return null;
+        }
+        return $hash;
+    }
+
+    /**
+     * isAddress
+     *
+     * @param string $value
+     * @return bool
+     */
+    public static function isAddress(string $value): bool
+    {
+        if (preg_match('/^(0x|0X)?[a-f0-9A-F]{40}$/', $value) !== 1) {
+            return false;
+        } elseif (preg_match('/^(0x|0X)?[a-f0-9]{40}$/', $value) === 1 || preg_match('/^(0x|0X)?[A-F0-9]{40}$/', $value) === 1) {
+            return true;
+        }
+        return self::isAddressChecksum($value);
+    }
+
+    /**
+     * toBn
+     * Change number or number string to BigInteger.
+     *
+     * @param BigInteger|string|int $number
+     * @return array|BigInteger
+     */
+    public static function toBn($number)
+    {
+        if ($number instanceof BigInteger) {
+            $bn = $number;
+        } elseif (is_int($number)) {
+            $bn = new BigInteger($number);
+        } elseif (is_numeric($number)) {
+            $number = (string) $number;
+
+            if (self::isNegative($number)) {
+                $count = 1;
+                $number = str_replace('-', '', $number, $count);
+                $negative1 = new BigInteger(-1);
+            }
+            if (strpos($number, '.') > 0) {
+                $comps = explode('.', $number);
+
+                if (count($comps) > 2) {
+                    throw new InvalidArgumentException('toBn number must be a valid number.');
+                }
+                $whole = $comps[0];
+                $fraction = $comps[1];
+
+                return [
+                    new BigInteger($whole),
+                    new BigInteger($fraction),
+                    strlen($comps[1]),
+                    $negative1 ?? false
+                ];
+            } else {
+                $bn = new BigInteger($number);
+            }
+            if (isset($negative1)) {
+                $bn = $bn->multiply($negative1);
+            }
+        } elseif (is_string($number)) {
+            $number = mb_strtolower($number);
+
+            if (self::isNegative($number)) {
+                $count = 1;
+                $number = str_replace('-', '', $number, $count);
+                $negative1 = new BigInteger(-1);
+            }
+            if (self::isZeroPrefixed($number) || preg_match('/[a-f]+/', $number) === 1) {
+                $number = self::stripZero($number);
+                $bn = new BigInteger($number, 16);
+            } elseif (empty($number)) {
+                $bn = new BigInteger(0);
+            } else {
+                throw new InvalidArgumentException('toBn number must be valid hex string.');
+            }
+            if (isset($negative1)) {
+                $bn = $bn->multiply($negative1);
+            }
+        } else {
+            throw new InvalidArgumentException('toBn number must be BigInteger, string or int.');
+        }
+        return $bn;
+    }
+
+    /**
+     * 根据精度展示资产
+     * @param $number
+     * @param int $decimals
+     * @return string
+     */
+    public static function toDisplayAmount($number, int $decimals): string
+    {
+        $number = number_format($number,0,'.','');//格式化
+        $bn = self::toBn($number);
+        $bnt = self::toBn(pow(10, $decimals));
+
+        return self::divideDisplay($bn->divide($bnt), $decimals);
+    }
+
+    public static function divideDisplay(array $divResult, int $decimals): string
+    {
+        list($bnq, $bnr) = $divResult;
+        $ret = "$bnq->value";
+        if ($bnr->value > 0) {
+            $ret .= '.' . rtrim(sprintf("%0{$decimals}d", $bnr->value), '0');
+        }
+
+        return $ret;
     }
 }
