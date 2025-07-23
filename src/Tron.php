@@ -553,33 +553,10 @@ class Tron implements TronInterface
     public function getAccount(string $address = null): array
     {
         $address = (!is_null($address) ? $this->toHex($address) : $this->address['hex']);
-
         return $this->manager->request('walletsolidity/getaccount', [
             'address'   =>  $address
         ]);
     }
-
-    /**
-     * Getting a balance
-     *
-     * @param string $address
-     * @param bool $fromTron
-     * @return float
-     * @throws TronException
-     */
-    public function getBalance(string $address = null, bool $fromTron = false): float
-    {
-        $account = $this->getAccount($address);
-
-        if(!array_key_exists('balance', $account)) {
-            return 0;
-        }
-
-        return ($fromTron == true ?
-            $this->fromTron($account['balance']) :
-            $account['balance']);
-    }
-
 
     /**
      * Get token balance

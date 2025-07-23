@@ -28,14 +28,6 @@ interface TronInterface
     public function setAddress(string $address) : void;
 
     /**
-     * Getting a balance
-     *
-     * @param string $address
-     * @return array
-     */
-    public function getBalance(string $address = null);
-
-    /**
      * Query transaction based on id
      *
      * @param $transactionID

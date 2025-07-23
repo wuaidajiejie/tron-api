@@ -1,4 +1,5 @@
 # User-specific stuff
+.idea/
 .idea/**/workspace.xml
 .idea/php.xml
 .idea/vcs.xml
@@ -68,3 +69,5 @@ vendor/
 .idea/misc.xml
 .idea/modules.xml
 .idea/tron-api.iml
+
+/tests/
