@@ -17,6 +17,7 @@ declare(strict_types=1);
 namespace Wuaidajiejie\TronAPI;
 
 use Elliptic\EC;
+use InvalidArgumentException;
 use Wuaidajiejie\TronAPI\Exception\TRC20Exception;
 use Wuaidajiejie\TronAPI\Support\Base58;
 use Wuaidajiejie\TronAPI\Support\Base58Check;
@@ -26,6 +27,7 @@ use Wuaidajiejie\TronAPI\Support\Keccak;
 use Wuaidajiejie\TronAPI\Support\Utils;
 use Wuaidajiejie\TronAPI\Provider\HttpProviderInterface;
 use Wuaidajiejie\TronAPI\Exception\TronException;
+use Wuaidajiejie\TronAPI\Support\Key as SupportKey;
 
 /**
  * A PHP API for interacting with the Tron (TRX)
@@ -1356,11 +1358,28 @@ class Tron implements TronInterface
      */
     public function getTokenByID(string $token_id): array
     {
-        if(!is_string($token_id))
-            throw new TronException('Invalid token ID provided');
-
         return $this->manager->request('/wallet/getassetissuebyid', [
             'value' =>  $token_id
         ]);
+    }
+
+    /**
+     * @throws TronException
+     */
+    public function privateKeyToAddress(string $privateKeyHex): string
+    {
+        try {
+            $addressHex = self::ADDRESS_PREFIX . SupportKey::privateKeyToAddress($privateKeyHex);
+            $addressBase58 = SupportKey::getBase58CheckAddress($addressHex);
+        } catch (InvalidArgumentException $e) {
+            throw new TronException($e->getMessage());
+        }
+//        $address = new Address($addressBase58, $privateKeyHex, $addressHex);
+        $validAddress = $this->validateAddress($addressBase58);
+        if (!$validAddress) {
+            throw new TronException('Invalid private key');
+        }
+
+        return $addressBase58;
     }
 }
